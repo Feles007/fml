@@ -13,46 +13,59 @@ impl Vec3 {
 	pub const ZERO: Self = Self::splat(0.0);
 	pub const ONE: Self = Self::splat(1.0);
 
+	#[inline]
 	pub const fn new(x: f32, y: f32, z: f32) -> Self {
 		let array = [x, y, z, 0.0];
 		Self {
 			inner: unsafe { transmute(array) },
 		}
 	}
+	#[inline]
 	pub fn x(self) -> f32 {
 		unsafe { f32::from_bits(_mm_extract_ps::<0>(self.inner) as u32) }
 	}
+	#[inline]
 	pub fn y(self) -> f32 {
 		unsafe { f32::from_bits(_mm_extract_ps::<1>(self.inner) as u32) }
 	}
+	#[inline]
 	pub fn z(self) -> f32 {
 		unsafe { f32::from_bits(_mm_extract_ps::<2>(self.inner) as u32) }
 	}
+	#[inline]
 	pub const fn splat(f: f32) -> Self {
 		Self::new(f, f, f)
 	}
+	#[inline]
 	pub fn with_x(self, x: f32) -> Self {
 		Self::new(x, self.y(), self.z())
 	}
+	#[inline]
 	pub fn with_y(self, y: f32) -> Self {
 		Self::new(self.x(), y, self.z())
 	}
+	#[inline]
 	pub fn with_z(self, z: f32) -> Self {
 		Self::new(self.x(), self.y(), z)
 	}
+	#[inline]
 	pub fn magnitude_squared(self) -> f32 {
 		self.x() * self.x() + self.y() * self.y() + self.z() * self.z()
 	}
+	#[inline]
 	pub fn magnitude(self) -> f32 {
 		self.magnitude_squared().sqrt()
 	}
+	#[inline]
 	pub fn normalize(self) -> Self {
 		self / self.magnitude()
 	}
+	#[inline]
 	pub fn dot(self, rhs: Self) -> f32 {
 		self.x() * rhs.x() + self.y() * rhs.y() + self.z() * rhs.z()
 	}
 	// https://geometrian.com/resources/cross_product/
+	#[inline]
 	pub fn cross(self, rhs: Self) -> Self {
 		let inner = unsafe {
 			let tmp0 = _mm_shuffle_ps::<201>(self.inner, self.inner);
@@ -74,10 +87,12 @@ impl Vec3 {
 		let inner = unsafe { _mm_max_ps(self.inner, rhs.inner) };
 		Self { inner }
 	}
+	#[inline]
 	pub fn reciprocal(self) -> Self {
 		let inner = unsafe { _mm_rcp_ps(self.inner) };
 		Self { inner }
 	}
+	#[inline]
 	pub fn horizontal_max(self) -> f32 {
 		unsafe {
 			let v1 = self.inner;
@@ -88,6 +103,7 @@ impl Vec3 {
 			f32::from_bits(_mm_extract_ps::<0>(max2) as u32)
 		}
 	}
+	#[inline]
 	pub fn horizontal_min(self) -> f32 {
 		unsafe {
 			let v1 = self.inner;
@@ -102,6 +118,7 @@ impl Vec3 {
 impl Neg for Vec3 {
 	type Output = Self;
 
+	#[inline]
 	fn neg(self) -> Self::Output {
 		Self::new(-self.x(), -self.y(), -self.z())
 	}
@@ -109,12 +126,14 @@ impl Neg for Vec3 {
 impl Add for Vec3 {
 	type Output = Self;
 
+	#[inline]
 	fn add(self, rhs: Self) -> Self::Output {
 		let inner = unsafe { _mm_add_ps(self.inner, rhs.inner) };
 		Self { inner }
 	}
 }
 impl AddAssign for Vec3 {
+	#[inline]
 	fn add_assign(&mut self, rhs: Self) {
 		*self = *self + rhs;
 	}
@@ -122,12 +141,14 @@ impl AddAssign for Vec3 {
 impl Sub for Vec3 {
 	type Output = Self;
 
+	#[inline]
 	fn sub(self, rhs: Self) -> Self::Output {
 		let inner = unsafe { _mm_sub_ps(self.inner, rhs.inner) };
 		Self { inner }
 	}
 }
 impl SubAssign for Vec3 {
+	#[inline]
 	fn sub_assign(&mut self, rhs: Self) {
 		*self = *self - rhs
 	}
@@ -135,6 +156,7 @@ impl SubAssign for Vec3 {
 impl Mul for Vec3 {
 	type Output = Self;
 
+	#[inline]
 	fn mul(self, rhs: Self) -> Self::Output {
 		let inner = unsafe { _mm_mul_ps(self.inner, rhs.inner) };
 		Self { inner }
@@ -143,6 +165,7 @@ impl Mul for Vec3 {
 impl Mul<f32> for Vec3 {
 	type Output = Self;
 
+	#[inline]
 	fn mul(self, rhs: f32) -> Self::Output {
 		Self::new(self.x() * rhs, self.y() * rhs, self.z() * rhs)
 	}
@@ -150,6 +173,7 @@ impl Mul<f32> for Vec3 {
 impl Mul<Vec3> for f32 {
 	type Output = Vec3;
 
+	#[inline]
 	fn mul(self, rhs: Vec3) -> Self::Output {
 		rhs * self
 	}
@@ -157,6 +181,7 @@ impl Mul<Vec3> for f32 {
 impl Div for Vec3 {
 	type Output = Self;
 
+	#[inline]
 	fn div(self, rhs: Self) -> Self::Output {
 		let inner = unsafe { _mm_div_ps(self.inner, rhs.inner) };
 		Self { inner }
@@ -165,11 +190,13 @@ impl Div for Vec3 {
 impl Div<f32> for Vec3 {
 	type Output = Self;
 
+	#[inline]
 	fn div(self, rhs: f32) -> Self::Output {
 		Self::new(self.x() / rhs, self.y() / rhs, self.z() / rhs)
 	}
 }
 impl DivAssign<f32> for Vec3 {
+	#[inline]
 	fn div_assign(&mut self, rhs: f32) {
 		*self = *self / rhs
 	}
