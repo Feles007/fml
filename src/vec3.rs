@@ -115,7 +115,7 @@ impl Vec3 {
 		}
 	}
 	#[inline]
-	pub fn inner(self) -> __m128 {
+	pub fn as_inner(self) -> __m128 {
 		self.inner
 	}
 }
