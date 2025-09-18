@@ -114,6 +114,10 @@ impl Vec3 {
 			f32::from_bits(_mm_extract_ps::<0>(max2) as u32)
 		}
 	}
+	#[inline]
+	pub fn inner(self) -> __m128 {
+		self.inner
+	}
 }
 impl Neg for Vec3 {
 	type Output = Self;
